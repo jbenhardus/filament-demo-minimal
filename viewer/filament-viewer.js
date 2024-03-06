@@ -554,91 +554,57 @@ class FilamentViewer extends LitElement {
   registerCameraListeners() {
     window.onkeydown = (event) => {
       this.rotateCamera(event);
+      this.moveCamera(event);
+      console.log(
+        `camera: ${this.eye.join(', ')} center: ${this.center.join(', ')}`
+      );
+    };
+    window.onwheel = (event) => {
+      this.dollyCamera(event);
     };
   }
 
-  moveCamera(event) {
-    let [x, y, z] = this.eye;
-    switch (event.key) {
-      case 'ArrowUp':
-      case ',':
-        y -= 0.1;
-        this.eye = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      case 'ArrowDown':
-      case 'o':
-        y += 0.1;
-        this.eye = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      case 'ArrowRight':
-      case 'e':
-        x -= 0.1;
-        this.eye = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      case 'ArrowLeft':
-      case 'a':
-        x += 0.1;
-        this.eye = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      case "'":
-        z -= 0.1;
-        this.eye = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      case '.':
-        z += 0.1;
-        this.eye = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      default:
-        break;
+  dollyCamera(event) {
+    let [x, y, z] = this.center;
+    let [a, b, c] = this.eye;
+    if (event.deltaY > 0) {
+      z += 0.1;
+      c += 0.1;
+    } else if (event.deltaY < 0) {
+      z -= 0.1;
+      c -= 0.1;
     }
+    this.center = [x, y, z];
+    this.eye = [a, b, c];
+    this.camera.lookAt(this.eye, this.center, this.up);
   }
 
-  moveCenter(event) {
+  moveCamera(event) {
     let [x, y, z] = this.center;
+    let [a, b, c] = this.eye;
     switch (event.key) {
       case 'ArrowUp':
-      case ',':
-        y -= 0.1;
-        this.center = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
+        y += 0.1;
+        b += 0.1;
         break;
       case 'ArrowDown':
-      case 'o':
-        y += 0.1;
-        this.center = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
+        y -= 0.1;
+        b -= 0.1;
         break;
       case 'ArrowRight':
-      case 'e':
-        x -= 0.1;
-        this.center = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
+        x += 0.1;
+        a += 0.1;
         break;
       case 'ArrowLeft':
-      case 'a':
-        x += 0.1;
-        this.center = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      case "'":
-        z -= 0.1;
-        this.center = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
-        break;
-      case '.':
-        z += 0.1;
-        this.center = [x, y, z];
-        this.camera.lookAt(this.eye, this.center, this.up);
+        x -= 0.1;
+        a -= 0.1;
         break;
       default:
         break;
     }
+    this.center = [x, y, z];
+    this.eye = [a, b, c];
+    this.camera.lookAt(this.eye, this.center, this.up);
   }
 
   rotateCamera(event) {
@@ -647,52 +613,36 @@ class FilamentViewer extends LitElement {
     let vector = [x - a, y - b, z - c];
     let rotated, newCenter;
     switch (event.key) {
-      case 'ArrowUp':
       case ',':
         rotated = rotateVectorAboutAxis(vector, 'x', Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
-        this.center = newCenter;
-        this.camera.lookAt(this.eye, this.center, this.up);
         break;
-      case 'ArrowDown':
       case 'o':
         rotated = rotateVectorAboutAxis(vector, 'x', -Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
-        this.center = newCenter;
-        this.camera.lookAt(this.eye, this.center, this.up);
         break;
-      case 'ArrowRight':
       case 'e':
         rotated = rotateVectorAboutAxis(vector, 'y', Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
-        this.center = newCenter;
-        this.camera.lookAt(this.eye, this.center, this.up);
         break;
-      case 'ArrowLeft':
       case 'a':
         rotated = rotateVectorAboutAxis(vector, 'y', -Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
-        this.center = newCenter;
-        this.camera.lookAt(this.eye, this.center, this.up);
         break;
       case "'":
         rotated = rotateVectorAboutAxis(vector, 'z', Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
-        this.center = newCenter;
-        this.camera.lookAt(this.eye, this.center, this.up);
         break;
       case '.':
         rotated = rotateVectorAboutAxis(vector, 'z', -Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
-        this.center = newCenter;
-        this.camera.lookAt(this.eye, this.center, this.up);
         break;
       default:
+        newCenter = this.center;
         break;
     }
-    console.log(
-      `looking at ${this.center[0]}, ${this.center[1]}, ${this.center[2]}`
-    );
+    this.center = newCenter;
+    this.camera.lookAt(this.eye, this.center, this.up);
   }
 }
 
