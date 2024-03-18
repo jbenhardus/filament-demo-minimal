@@ -368,9 +368,56 @@ class FilamentViewer extends LitElement {
     if (this.srcBlob && this.srcBlob.name.endsWith('.glb')) {
       this.srcBlob.arrayBuffer().then((buffer) => {
         this.asset = this.loader.createAsset(new Uint8Array(buffer));
-        const aabb = this.asset.getBoundingBox();
-        this.assetRoot = this.asset.getRoot();
+        var center = [
+          (aabb.max[0] - aabb.min[0]) / 2,
+          (aabb.max[1] - aabb.min[1]) / 2,
+          (aabb.max[2] - aabb.min[2]) / 2,
+        ];
+        const halfExtent = [
+          (aabb.max[0] - aabb.min[0]) / 2,
+          (aabb.max[1] - aabb.min[1]) / 2,
+          (aabb.max[2] - aabb.min[2]) / 2,
+        ];
+        const maxExtent =
+          2 * Math.max(halfExtent[0], halfExtent[1], halfExtent[2]);
+        const scaleFactor = 2 / maxExtent;
+
+        //center = [center[0] - centerPoint[0] / scaleFactor, center[1] - centerPoint[1] / scaleFactor, center[2] - centerPoint[2] / scaleFactor]
+
+        console.log(aabb.max);
+        console.log(aabb.min);
+        console.log(center);
+        console.log(halfExtent);
+        console.log(maxExtent);
+        console.log('--');
+        console.log(scaleFactor);
+        console.log(center);
+
+        const matrix = [
+          scaleFactor,
+          0,
+          0,
+          0,
+          0,
+          scaleFactor,
+          0,
+          0,
+          0,
+          0,
+          scaleFactor,
+          0,
+          -center[0] * scaleFactor,
+          -center[1] * scaleFactor,
+          -center[2] * scaleFactor,
+          1,
+        ];
+        this.unitCubeTransform = matrix;
+        console.log(this.unitCubeTransform);
+
         this.unitCubeTransform = Filament.fitIntoUnitCube(aabb, zoffset);
+        console.log(this.unitCubeTransform);
+
+        this.assetRoot = this.asset.getRoot();
         this.asset.loadResources();
         this.animator = this.asset.getInstance().getAnimator();
         this.animationStartTime = Date.now();
