@@ -561,6 +561,9 @@ class FilamentViewer extends LitElement {
     };
     window.onwheel = (event) => {
       this.dollyCamera(event);
+      console.log(
+        `camera: ${this.eye.join(', ')} center: ${this.center.join(', ')}`
+      );
     };
   }
 
@@ -614,14 +617,17 @@ class FilamentViewer extends LitElement {
     let rotated, newCenter;
     switch (event.key) {
       case ',':
+      case 'w':
         rotated = rotateVectorAboutAxis(vector, 'x', Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
         break;
       case 'o':
+      case 's':
         rotated = rotateVectorAboutAxis(vector, 'x', -Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
         break;
       case 'e':
+      case 'd':
         rotated = rotateVectorAboutAxis(vector, 'y', Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
         break;
@@ -630,6 +636,7 @@ class FilamentViewer extends LitElement {
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
         break;
       case "'":
+      case 'q':
         rotated = rotateVectorAboutAxis(vector, 'z', Math.PI / 16);
         newCenter = [a + rotated[0], b + rotated[1], c + rotated[2]];
         break;
